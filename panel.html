@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrôle à distance</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        textarea { width: 80%; height: 100px; margin: 10px; }
+        button { padding: 10px 20px; font-size: 16px; }
+        pre { background: #f4f4f4; padding: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h2>🔧 Contrôle du PC à distance</h2>
+    <textarea id="command" placeholder="Entrez votre commande ici..."></textarea><br>
+    <button onclick="sendCommand()">Envoyer</button>
+    <h3>📜 Résultat :</h3>
+    <pre id="output">Aucun résultat pour l'instant...</pre>
+
+    <script>
+        const SERVER_URL = "http://ton-serveur.com";  // Remplace par ton vrai serveur
+
+        function sendCommand() {
+            let command = document.getElementById("command").value;
+            if (!command) { alert("Entrez une commande !"); return; }
+
+            fetch(SERVER_URL + "/command", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: "command=" + encodeURIComponent(command)
+            }).then(() => {
+                alert("Commande envoyée !");
+                getResult();
+            });
+        }
+
+        function getResult() {
+            fetch(SERVER_URL + "/view_result")
+            .then(response => response.text())
+            .then(data => { document.getElementById("output").innerText = data; });
+        }
+
+        setInterval(getResult, 5000); // Rafraîchit le résultat toutes les 5 secondes
+    </script>
+</body>
+</html>
