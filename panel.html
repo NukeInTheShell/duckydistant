@@ -3,46 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contrôle à distance</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
-        textarea { width: 80%; height: 100px; margin: 10px; }
-        button { padding: 10px 20px; font-size: 16px; }
-        pre { background: #f4f4f4; padding: 10px; border: 1px solid #ddd; }
-    </style>
+    <title>Panel de Commande</title>
 </head>
 <body>
-    <h2>🔧 Contrôle du PC à distance</h2>
-    <textarea id="command" placeholder="Entrez votre commande ici..."></textarea><br>
+    <h2>Envoyer une commande</h2>
+    <input type="text" id="commandInput" placeholder="Commande">
     <button onclick="sendCommand()">Envoyer</button>
-    <h3>📜 Résultat :</h3>
-    <pre id="output">Aucun résultat pour l'instant...</pre>
+
+    <h2>Résultat :</h2>
+    <pre id="resultOutput">Aucun résultat</pre>
 
     <script>
-       const serverUrl = "https://9556-86-247-149-113.ngrok-free.app";
-  // 🔥 Mets l'IP de ton VPS
+        const serverUrl = "http://192.168.X.X:5000"; // 🔥 Mets l'IP de ton serveur
 
         function sendCommand() {
-            let command = document.getElementById("command").value;
-            if (!command) { alert("Entrez une commande !"); return; }
-
-            fetch(SERVER_URL + "/command", {
+            const command = document.getElementById("commandInput").value;
+            fetch(`${serverUrl}/command`, {
                 method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: "command=" + encodeURIComponent(command)
-            }).then(() => {
-                alert("Commande envoyée !");
-                getResult();
-            });
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ command: command })
+            }).then(response => response.json())
+              .then(data => console.log(data));
         }
 
         function getResult() {
-            fetch(SERVER_URL + "/view_result")
-            .then(response => response.text())
-            .then(data => { document.getElementById("output").innerText = data; });
+            fetch(`${serverUrl}/get_result`)
+                .then(response => response.json())
+                .then(data => document.getElementById("resultOutput").textContent = data.output);
         }
 
-        setInterval(getResult, 5000); // Rafraîchit le résultat toutes les 5 secondes
+        setInterval(getResult, 5000);  // 🔄 Met à jour le résultat toutes les 5 secondes
     </script>
 </body>
 </html>
